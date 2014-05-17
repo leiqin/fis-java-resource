@@ -22,9 +22,13 @@ public class UrlTag extends TagSupport {
 		try {
 			String url = resource.require(this.id);
 			out.append(url);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			try {
+				out.append(this.id);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		return SKIP_BODY;
 	}

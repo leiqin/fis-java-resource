@@ -3,5 +3,7 @@ bin
 target/
 dist/
 local/
-build.xml
-web/
+.project
+.classpath
+.settings/
+
