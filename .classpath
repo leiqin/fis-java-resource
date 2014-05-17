@@ -1,26 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-  <classpathentry kind="src" path="src"/>
-  <classpathentry kind="output" path="local/classes"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="lib" path="lib/javax.servlet-3.0.jar"/>
-  <classpathentry kind="lib" path="lib/gson-2.2.2.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-jdbc.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/servlet-api.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/annotations-api.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-coyote.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-i18n-es.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-util.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/jsp-api.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-i18n-fr.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-dbcp.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/catalina-ant.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/jasper-el.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-i18n-ja.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/jasper.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/catalina.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/catalina-ha.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/ecj-4.2.2.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/el-api.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/catalina-tribes.jar"/>
-  <classpathentry kind="lib" path="/home/leiqin/.local/share/apache-tomcat/lib/tomcat-api.jar"/>
+	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
+	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/jstl/1.2/jstl-1.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/jsp-api/2.0/jsp-api-2.0.jar"/>
+	<classpathentry exported="true" kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.6/slf4j-api-1.7.6.jar"/>
+	<classpathentry exported="true" kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.7.6/slf4j-log4j12-1.7.6.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

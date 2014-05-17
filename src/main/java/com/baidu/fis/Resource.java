@@ -100,7 +100,8 @@ public class Resource {
                 if(info.containsKey("deps")){
                     List deps = (List)info.get("deps");
                     for(Object dep:deps){
-                        this.require((String) dep);
+						if (map.get(dep) != null)
+							this.require((String) dep);
                     }
                 }
                 String type = (String) info.get("type");
