@@ -4,55 +4,56 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONReader;
+import com.google.gson.Gson;
 
 public class Resource {
 	public static final String CONTEXT_ATTR_NAME = "com.baidu.fis.resource";
-    public static final String STYLE_PLACEHOLDER = "<!--FIS_STYLE_PLACEHOLDER-->";
-    public static final String SCRIPT_PLACEHOLDER = "<!--FIS_SCRIPT_PLACEHOLDER-->";
-    
-    public static enum ScriptPoolRenderOrder {
-        important,
-        normal, 
-        optional;
-    }
-    
-    private String mapDir;
-    @SuppressWarnings("rawtypes")
-    private Map<String, Map> map;
-    private Map<String, String> loaded;
-    private Map<String, ArrayList<String>> collection;
-    private ScriptPoolRenderOrder[] scriptPoolRenderOrder = {ScriptPoolRenderOrder.important,
-            ScriptPoolRenderOrder.normal, ScriptPoolRenderOrder.optional};
-    
-    private Map<String, StringBuilder> scriptPool;
-    
-    public Boolean debug = false;
+	public static final String STYLE_PLACEHOLDER = "<!--FIS_STYLE_PLACEHOLDER-->";
+	public static final String SCRIPT_PLACEHOLDER = "<!--FIS_SCRIPT_PLACEHOLDER-->";
 
-    public void setMapDir(String dir) {
-        this.mapDir = dir;
-    }
-    
-    @SuppressWarnings("rawtypes")
-    public Resource(){
-        this.map = new HashMap<String, Map>();
-        this.loaded = new HashMap<String, String>();
-        this.collection = new HashMap<String, ArrayList<String>>();
-        this.scriptPool = new HashMap<String, StringBuilder>();
-    }
-    
-    public Resource(String dir){
-        this();
-        this.setMapDir(dir);
-    }
-    
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Map<String, Map> getMap(String id) throws FileNotFoundException{
+	public static enum ScriptPoolRenderOrder {
+		important, normal, optional;
+	}
+
+	private String mapDir;
+	@SuppressWarnings("rawtypes")
+	private Map<String, Map> map;
+	private Map<String, String> loaded;
+	private Map<String, ArrayList<String>> collection;
+	private ScriptPoolRenderOrder[] scriptPoolRenderOrder = {
+			ScriptPoolRenderOrder.important, ScriptPoolRenderOrder.normal,
+			ScriptPoolRenderOrder.optional };
+
+	private Map<String, StringBuilder> scriptPool;
+
+	public Boolean debug = false;
+
+	public void setMapDir(String dir) {
+		this.mapDir = dir;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Resource() {
+		this.map = new HashMap<String, Map>();
+		this.loaded = new HashMap<String, String>();
+		this.collection = new HashMap<String, ArrayList<String>>();
+		this.scriptPool = new HashMap<String, StringBuilder>();
+	}
+
+	public Resource(String dir) {
+		this();
+		this.setMapDir(dir);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private Map<String, Map> getMap(String id) throws FileNotFoundException,
+			UnsupportedEncodingException {
         String namespace = "__global__";
         int pos = id.indexOf(':');
         if (pos != -1) {
@@ -61,16 +62,16 @@ public class Resource {
         if(!map.containsKey(namespace)){
             String filename = namespace.equals("__global__") ? "map.json" : namespace + "-map.json";
             File file = new File(mapDir + "/" + filename);
-            InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
-            JSONReader json = new JSONReader(reader);
-            map.put(namespace, json.readObject(HashMap.class));
-            json.close();
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "utf-8");
+			Gson gson = new Gson();
+            map.put(namespace, gson.fromJson(reader, Map.class));
         }
         return map.get(namespace);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes"})
-    public String require(String id) throws FileNotFoundException{
+	public String require(String id) throws FileNotFoundException,
+			UnsupportedEncodingException {
         String uri = loaded.get(id);
         if(uri != null){
             return uri;
@@ -87,7 +88,7 @@ public class Resource {
                     info = res.get(pkg);
                     uri = (String) info.get("uri");
                     if(info.containsKey("has")){
-                        Object[] has = ((JSONArray)info.get("has")).toArray();
+                        List has = (List)info.get("has");
                         for(Object obj:has){
                             loaded.put((String) obj, uri);
                         }
@@ -97,7 +98,7 @@ public class Resource {
                     loaded.put(id, uri);
                 }
                 if(info.containsKey("deps")){
-                    Object[] deps = ((JSONArray)info.get("deps")).toArray();
+                    List deps = (List)info.get("deps");
                     for(Object dep:deps){
                         this.require((String) dep);
                     }

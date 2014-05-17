@@ -1,1 +1,7 @@
 bin
+*.swp
+target/
+dist/
+local/
+build.xml
+web/
