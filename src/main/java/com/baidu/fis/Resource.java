@@ -3,12 +3,14 @@ package com.baidu.fis;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +18,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 public class Resource {
-	private static final Logger logger =
-		LoggerFactory.getLogger(Resource.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(Resource.class);
 
 	public static final String CONTEXT_ATTR_NAME = "com.baidu.fis.resource";
 	public static final String STYLE_PLACEHOLDER = "<!--FIS_STYLE_PLACEHOLDER-->";
@@ -57,8 +59,52 @@ public class Resource {
 		this.setMapDir(dir);
 	}
 
+	private static ConcurrentHashMap<String, MapJsonCache> mapJsonCached = 
+		new ConcurrentHashMap<>();
+
+	static class MapJsonCache {
+
+		String key;
+		long timestamp;
+		Map<String, Map> data;
+
+	}
+
+	private static Map<String, Map> loadMapJson(File file)
+			throws UnsupportedEncodingException, FileNotFoundException {
+		String canonicalPath = null;
+		try {
+			canonicalPath = file.getCanonicalPath();
+		} catch (IOException e) {
+			logger.warn("getCanonicalPath error", e);
+		}
+
+		if (canonicalPath == null) {
+			return loadMapJsonFromFile(file);
+		}
+
+		MapJsonCache cache = mapJsonCached.get(canonicalPath);
+		if (cache == null || cache.timestamp != file.lastModified()) {
+			cache = new MapJsonCache();
+			cache.key = canonicalPath;
+			cache.timestamp = file.lastModified();
+			cache.data = loadMapJsonFromFile(file);
+			mapJsonCached.put(cache.key, cache);
+		}
+		return cache.data;
+	}
+
+	private static Map<String, Map> loadMapJsonFromFile(File file)
+			throws UnsupportedEncodingException, FileNotFoundException {
+		logger.info("load map.json from file : {}", file);
+		InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "utf-8");
+		Gson gson = new Gson();
+		Map<String, Map> mapJson = gson.fromJson(reader, Map.class);
+		return mapJson;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Map<String, Map> getMap(String id) throws FileNotFoundException,
+	private Map<String, Map> getMapJson(String id) throws FileNotFoundException,
 			UnsupportedEncodingException {
         String namespace = "__global__";
         int pos = id.indexOf(':');
@@ -68,10 +114,9 @@ public class Resource {
         if(!mapJsonMap.containsKey(namespace)){
             String filename = namespace.equals("__global__") ? "map.json" : namespace + "-map.json";
             File file = new File(mapDir + "/" + filename);
-			logger.debug("map.json file : {}", file);
-            InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "utf-8");
-			Gson gson = new Gson();
-            mapJsonMap.put(namespace, gson.fromJson(reader, Map.class));
+			logger.debug("use map.json file : {}", file);
+			Map<String, Map> mapJson = loadMapJson(file);
+            mapJsonMap.put(namespace, mapJson);
         }
         return mapJsonMap.get(namespace);
     }
@@ -85,7 +130,7 @@ public class Resource {
             return uri;
         } 
 
-		Map<String, Map> mapJson = this.getMap(id);
+		Map<String, Map> mapJson = this.getMapJson(id);
 		Map<String, Map> res = mapJson.get("res");
 		Map<String, Object> info = res.get(id);
 		if(info == null){
@@ -115,6 +160,7 @@ public class Resource {
 					this.require((String) dep);
 				}
 			}
+
 			String type = (String) info.get("type");
 			ArrayList<String> list = collection.get(type);
 			if(list == null){
