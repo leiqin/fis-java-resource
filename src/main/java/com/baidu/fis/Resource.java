@@ -8,8 +8,10 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FilenameUtils;
@@ -34,7 +36,7 @@ public class Resource {
 	@SuppressWarnings("rawtypes")
 	private Map<String, Map> mapJsonMap;
 	private Map<String, String> loaded;
-	private Map<String, ArrayList<String>> collection;
+	private Map<String, Set<String>> resourceTypeCollection;
 	private ScriptPoolRenderOrder[] scriptPoolRenderOrder = {
 			ScriptPoolRenderOrder.important, ScriptPoolRenderOrder.normal,
 			ScriptPoolRenderOrder.optional };
@@ -51,7 +53,7 @@ public class Resource {
 	public Resource() {
 		this.mapJsonMap = new HashMap<String, Map>();
 		this.loaded = new HashMap<String, String>();
-		this.collection = new HashMap<String, ArrayList<String>>();
+		this.resourceTypeCollection = new HashMap<String, Set<String>>();
 		this.scriptPool = new HashMap<String, StringBuilder>();
 	}
 
@@ -169,10 +171,10 @@ public class Resource {
 			}
 
 			String type = (String) info.get("type");
-			ArrayList<String> list = collection.get(type);
+			Set<String> list = resourceTypeCollection.get(type);
 			if(list == null){
-				list = new ArrayList<String>();
-				collection.put(type, list);
+				list = new LinkedHashSet<String>();
+				resourceTypeCollection.put(type, list);
 			}
 			list.add(uri);
 		}
@@ -186,7 +188,7 @@ public class Resource {
     public void reset() {
         mapJsonMap.clear();
         loaded.clear();
-        collection.clear();
+        resourceTypeCollection.clear();
         scriptPool.clear();
     }
 
@@ -233,7 +235,7 @@ public class Resource {
     }
     
     public String render(String type, Boolean reset){
-        ArrayList<String> list = this.getCollection(type);
+        Set<String> list = this.getCollection(type);
         StringBuffer buffer = new StringBuffer();
         if(list != null){
             if(type.equals("js")){
@@ -252,8 +254,8 @@ public class Resource {
         return buffer.toString();
     }
     
-    public ArrayList<String> getCollection(String type){
-        return collection.get(type);
+    public Set<String> getCollection(String type){
+        return resourceTypeCollection.get(type);
     }
 
 }
