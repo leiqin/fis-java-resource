@@ -1,23 +1,27 @@
 package com.baidu.fis;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+import javax.servlet.jsp.tagext.DynamicAttributes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HtmlTag extends BodyTagSupport {
+public class HtmlTag extends BodyTagSupport implements DynamicAttributes {
 	private static final Logger logger =
 		LoggerFactory.getLogger(HtmlTag.class);
 
 	
 	private String mapDir = "/";
 	private Resource resource;
+	private Map<String, Object> dynamicAttributes = new LinkedHashMap<>();
 
 	/**
 	 * 
@@ -27,7 +31,8 @@ public class HtmlTag extends BodyTagSupport {
 	public int doStartTag() throws JspException{
 		JspWriter out = pageContext.getOut();
 		try {
-			out.append("<html>");
+			String tagStr = Utils.buildTagString("html", dynamicAttributes);
+			out.append(tagStr);
 		} catch (IOException e) {
 			logger.error("", e);
 		}
@@ -58,6 +63,13 @@ public class HtmlTag extends BodyTagSupport {
 
 	public void setMapDir(String mapDir) {
 		this.mapDir = mapDir;
+	}
+
+	@Override
+	public void setDynamicAttribute(String uri, String name, Object value)
+			throws JspException {
+		logger.debug("DynamicAttributes : {} , {} , {}", uri, name, value);
+		dynamicAttributes.put(name, value);
 	}
 
 }

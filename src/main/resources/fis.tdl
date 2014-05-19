@@ -27,6 +27,7 @@
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+		<dynamic-attributes>true</dynamic-attributes>
     </tag>
     <tag>
         <name>scripts</name>
@@ -52,5 +53,16 @@
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+    </tag>
+    <tag>
+        <name>img</name>
+        <tag-class>com.baidu.fis.ImgTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>src</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+		<dynamic-attributes>true</dynamic-attributes>
     </tag>
 </taglib>

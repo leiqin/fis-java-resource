@@ -17,7 +17,7 @@ public class UrlTag extends TagSupport {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8694856279353734532L;
+	private static final long serialVersionUID = 8694856279353734531L;
 	
 	private String id;
 	
