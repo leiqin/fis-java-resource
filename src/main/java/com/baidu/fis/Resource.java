@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -69,10 +68,12 @@ public class Resource {
 
 		String key;
 		long timestamp;
+		@SuppressWarnings("rawtypes")
 		Map<String, Map> data;
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static Map<String, Map> loadMapJson(File file)
 			throws UnsupportedEncodingException, FileNotFoundException {
 		String canonicalPath = null;
@@ -97,6 +98,7 @@ public class Resource {
 		return cache.data;
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static Map<String, Map> loadMapJsonFromFile(File file)
 			throws UnsupportedEncodingException, FileNotFoundException {
 		logger.info("load map.json from file : {}", file);
