@@ -8,7 +8,13 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HtmlTag extends BodyTagSupport {
+	private static final Logger logger =
+		LoggerFactory.getLogger(HtmlTag.class);
+
 	
 	private String mapDir = "/";
 	private Resource resource;
@@ -23,11 +29,11 @@ public class HtmlTag extends BodyTagSupport {
 		try {
 			out.append("<html>");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		}
 		HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 		String path = request.getSession().getServletContext().getRealPath(mapDir);
+		logger.debug("realMapDir : {}", path);
 		resource = new Resource(path);
 		request.setAttribute(Resource.CONTEXT_ATTR_NAME, resource);
 		return EVAL_BODY_BUFFERED;
@@ -41,8 +47,7 @@ public class HtmlTag extends BodyTagSupport {
 		try {
 			out.write(html);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		}
 		return EVAL_PAGE;
 	}

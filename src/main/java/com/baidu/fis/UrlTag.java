@@ -6,7 +6,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class UrlTag extends TagSupport {
+	private static final Logger logger =
+		LoggerFactory.getLogger(UrlTag.class);
+
 
 	/**
 	 * 
@@ -23,11 +29,11 @@ public class UrlTag extends TagSupport {
 			String url = resource.require(this.id);
 			out.append(url);
 		} catch (Exception e) {
+			logger.warn("require resouce error", e);
 			try {
 				out.append(this.id);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (IOException ioError) {
+				logger.error("", ioError);
 			}
 		}
 		return SKIP_BODY;

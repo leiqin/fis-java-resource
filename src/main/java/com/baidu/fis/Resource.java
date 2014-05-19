@@ -10,9 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 
 public class Resource {
+	private static final Logger logger =
+		LoggerFactory.getLogger(Resource.class);
+
 	public static final String CONTEXT_ATTR_NAME = "com.baidu.fis.resource";
 	public static final String STYLE_PLACEHOLDER = "<!--FIS_STYLE_PLACEHOLDER-->";
 	public static final String SCRIPT_PLACEHOLDER = "<!--FIS_SCRIPT_PLACEHOLDER-->";
@@ -23,7 +29,7 @@ public class Resource {
 
 	private String mapDir;
 	@SuppressWarnings("rawtypes")
-	private Map<String, Map> map;
+	private Map<String, Map> mapJsonMap;
 	private Map<String, String> loaded;
 	private Map<String, ArrayList<String>> collection;
 	private ScriptPoolRenderOrder[] scriptPoolRenderOrder = {
@@ -40,7 +46,7 @@ public class Resource {
 
 	@SuppressWarnings("rawtypes")
 	public Resource() {
-		this.map = new HashMap<String, Map>();
+		this.mapJsonMap = new HashMap<String, Map>();
 		this.loaded = new HashMap<String, String>();
 		this.collection = new HashMap<String, ArrayList<String>>();
 		this.scriptPool = new HashMap<String, StringBuilder>();
@@ -59,14 +65,15 @@ public class Resource {
         if (pos != -1) {
             namespace = id.substring(0, pos);
         }
-        if(!map.containsKey(namespace)){
+        if(!mapJsonMap.containsKey(namespace)){
             String filename = namespace.equals("__global__") ? "map.json" : namespace + "-map.json";
             File file = new File(mapDir + "/" + filename);
+			logger.debug("map.json file : {}", file);
             InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "utf-8");
 			Gson gson = new Gson();
-            map.put(namespace, gson.fromJson(reader, Map.class));
+            mapJsonMap.put(namespace, gson.fromJson(reader, Map.class));
         }
-        return map.get(namespace);
+        return mapJsonMap.get(namespace);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes"})
@@ -74,45 +81,48 @@ public class Resource {
 			UnsupportedEncodingException {
         String uri = loaded.get(id);
         if(uri != null){
+			logger.debug("require : {} {}", id, uri);
             return uri;
-        } else {
-            Map<String, Map> map = this.getMap(id);
-            Map<String, Map> res = map.get("res");
-            Map<String, Object> info = res.get(id);
-            if(info == null){
-                throw new IllegalArgumentException("missing resource [" + id + "]");
-            } else {
-                String pkg = (String) info.get("pkg");
-                if(!debug && pkg != null){
-                    res = map.get("pkg");
-                    info = res.get(pkg);
-                    uri = (String) info.get("uri");
-                    if(info.containsKey("has")){
-                        List has = (List)info.get("has");
-                        for(Object obj:has){
-                            loaded.put((String) obj, uri);
-                        }
-                    }
-                } else {
-                    uri = (String) info.get("uri");
-                    loaded.put(id, uri);
-                }
-                if(info.containsKey("deps")){
-                    List deps = (List)info.get("deps");
-                    for(Object dep:deps){
-						if (map.get(dep) != null)
-							this.require((String) dep);
-                    }
-                }
-                String type = (String) info.get("type");
-                ArrayList<String> list = collection.get(type);
-                if(list == null){
-                    list = new ArrayList<String>();
-                    collection.put(type, list);
-                }
-                list.add(uri);
-            }
-        }
+        } 
+
+		Map<String, Map> mapJson = this.getMap(id);
+		Map<String, Map> res = mapJson.get("res");
+		Map<String, Object> info = res.get(id);
+		if(info == null){
+			logger.warn("missing resource : {}", id);
+		} else {
+			String pkg = (String) info.get("pkg");
+			if(!debug && pkg != null){
+				res = mapJson.get("pkg");
+				info = res.get(pkg);
+				uri = (String) info.get("uri");
+				if(info.containsKey("has")){
+					List has = (List)info.get("has");
+					for(Object obj:has){
+						loaded.put((String) obj, uri);
+					}
+				}
+			} else {
+				uri = (String) info.get("uri");
+				loaded.put(id, uri);
+			}
+			logger.debug("require : {} {}", id, uri);
+
+			if(info.containsKey("deps")){
+				List deps = (List)info.get("deps");
+				logger.info("get deps {} {}", id, deps);
+				for(Object dep:deps){
+					this.require((String) dep);
+				}
+			}
+			String type = (String) info.get("type");
+			ArrayList<String> list = collection.get(type);
+			if(list == null){
+				list = new ArrayList<String>();
+				collection.put(type, list);
+			}
+			list.add(uri);
+		}
         return uri;
     }
 
@@ -121,7 +131,7 @@ public class Resource {
     }
 
     public void reset() {
-        map.clear();
+        mapJsonMap.clear();
         loaded.clear();
         collection.clear();
         scriptPool.clear();

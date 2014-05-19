@@ -3,7 +3,13 @@ package com.baidu.fis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class RequireTag extends TagSupport {
+	private static final Logger logger =
+		LoggerFactory.getLogger(RequireTag.class);
+
 
 	/**
 	 * 
@@ -18,8 +24,7 @@ public class RequireTag extends TagSupport {
 		try {
 			resource.require(this.id);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("require resouce error", e);
 		}
 		return SKIP_BODY;
 	}

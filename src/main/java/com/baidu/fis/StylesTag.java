@@ -5,7 +5,13 @@ import java.io.IOException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StylesTag extends TagSupport {
+	private static final Logger logger =
+		LoggerFactory.getLogger(StylesTag.class);
+
 
 	/**
 	 * 
@@ -17,8 +23,7 @@ public class StylesTag extends TagSupport {
 		try {
 			out.append(Resource.STYLE_PLACEHOLDER);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("", e);
 		}
 		return SKIP_BODY;
 	}
