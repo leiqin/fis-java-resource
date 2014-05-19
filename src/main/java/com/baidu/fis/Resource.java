@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,9 +155,15 @@ public class Resource {
 			logger.debug("require : {} {}", id, uri);
 
 			if(info.containsKey("deps")){
-				List deps = (List)info.get("deps");
+				List<String> deps = (List<String>)info.get("deps");
 				logger.info("get deps {} {}", id, deps);
-				for(Object dep:deps){
+				String parentPath = null;
+				for(String dep:deps){
+					if (dep.startsWith("./") || dep.startsWith("../")) {
+						if (parentPath == null)
+							parentPath = new File(id).getParent();
+						dep = FilenameUtils.concat(parentPath, dep);
+					}
 					this.require((String) dep);
 				}
 			}
@@ -248,4 +255,5 @@ public class Resource {
     public ArrayList<String> getCollection(String type){
         return collection.get(type);
     }
+
 }
