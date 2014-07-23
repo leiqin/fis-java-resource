@@ -202,15 +202,8 @@ public class Resource {
 				res = mapJson.get("pkg");
 				info = res.get(pkg);
 				uri = (String) info.get("uri");
-				if(info.containsKey("has")){
-					List has = (List)info.get("has");
-					for(Object obj:has){
-						loaded.put((String) obj, uri);
-					}
-				}
 			} else {
 				uri = (String) info.get("uri");
-				loaded.put(id, uri);
 			}
 			logger.debug("justGetUrl : {} {}", id, uri);
 		}
