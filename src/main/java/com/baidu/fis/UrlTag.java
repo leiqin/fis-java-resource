@@ -26,7 +26,7 @@ public class UrlTag extends TagSupport {
 		HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 		Resource resource = (Resource) request.getAttribute(Resource.CONTEXT_ATTR_NAME);
 		try {
-			String url = resource.require(this.id);
+			String url = resource.justGetUrl(this.id);
 			out.append(url);
 		} catch (Exception e) {
 			logger.warn("require resouce error", e);

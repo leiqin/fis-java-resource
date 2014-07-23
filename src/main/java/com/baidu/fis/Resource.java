@@ -156,6 +156,41 @@ public class Resource {
 				uri = (String) info.get("uri");
 				loaded.put(id, uri);
 			}
+			logger.debug("justGetUrl : {} {}", id, uri);
+
+		}
+        return uri;
+    }
+
+	public String justGetUrl(String id) throws FileNotFoundException,
+			UnsupportedEncodingException {
+        String uri = loaded.get(id);
+        if(uri != null){
+			logger.debug("justGetUrl : {} {}", id, uri);
+            return uri;
+        } 
+
+		Map<String, Map> mapJson = this.getMapJson(id);
+		Map<String, Map> res = mapJson.get("res");
+		Map<String, Object> info = res.get(id);
+		if(info == null){
+			logger.warn("missing resource : {}", id);
+		} else {
+			String pkg = (String) info.get("pkg");
+			if(!debug && pkg != null){
+				res = mapJson.get("pkg");
+				info = res.get(pkg);
+				uri = (String) info.get("uri");
+				if(info.containsKey("has")){
+					List has = (List)info.get("has");
+					for(Object obj:has){
+						loaded.put((String) obj, uri);
+					}
+				}
+			} else {
+				uri = (String) info.get("uri");
+				loaded.put(id, uri);
+			}
 			logger.debug("require : {} {}", id, uri);
 
 			if(info.containsKey("deps")){
@@ -181,7 +216,7 @@ public class Resource {
 			list.add(uri);
 		}
         return uri;
-    }
+	}
 
     public String getMapDir() {
         return mapDir;
