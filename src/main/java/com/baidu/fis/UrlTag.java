@@ -22,6 +22,7 @@ public class UrlTag extends TagSupport {
 	private String id;
 	
 	public int doStartTag() {
+		logger.debug("url tag : {}", id);
 		JspWriter out = pageContext.getOut();
 		HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 		Resource resource = (Resource) request.getAttribute(Resource.CONTEXT_ATTR_NAME);
